@@ -50,6 +50,7 @@ set(BRIDGE_MESSAGE_TYPES
   std_msgs
   tf2_msgs
   trajectory_msgs
+  synapse_msgs
 )
 
 set(generated_path "${CMAKE_BINARY_DIR}/generated")

@@ -93,6 +93,9 @@ MAPPINGS = {
         Mapping('UInt32', 'UInt32'),
         Mapping('String', 'StringMsg'),
     ],
+    'synapse_msgs': [
+        Mapping('PolynomialTrajectory', 'PolynomialTrajectory'),
+    ],
     'tf2_msgs': [
         Mapping('TFMessage', 'Pose_V'),
     ],

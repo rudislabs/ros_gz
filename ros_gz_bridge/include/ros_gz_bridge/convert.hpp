@@ -22,6 +22,7 @@
 #include <ros_gz_bridge/convert/rosgraph_msgs.hpp>
 #include <ros_gz_bridge/convert/sensor_msgs.hpp>
 #include <ros_gz_bridge/convert/std_msgs.hpp>
+#include <ros_gz_bridge/convert/synapse_msgs.hpp>
 #include <ros_gz_bridge/convert/tf2_msgs.hpp>
 #include <ros_gz_bridge/convert/trajectory_msgs.hpp>
 
