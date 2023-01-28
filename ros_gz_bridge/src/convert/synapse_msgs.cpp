@@ -27,10 +27,6 @@ convert_ros_to_gz(
 
   gz_msg.set_sequence(ros_msg.sequence);
 
-  gz_msg.set_recompute(ros_msg.recompute);
-
-  gz_msg.set_is_bezier(ros_msg.is_bezier);
-
   gz_msg.set_time_start(ros_msg.time_start);
 
   gz_msg.set_time_end(ros_msg.time_end);
@@ -63,10 +59,6 @@ convert_gz_to_ros(
   convert_gz_to_ros(gz_msg.header(), ros_msg.header);
 
   ros_msg.sequence = gz_msg.sequence();
-
-  ros_msg.recompute = gz_msg.recompute();
-
-  ros_msg.is_bezier = gz_msg.is_bezier();
 
   ros_msg.time_start = gz_msg.time_start();
 
