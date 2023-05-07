@@ -99,7 +99,7 @@ MAPPINGS = {
         Mapping('String', 'StringMsg'),
     ],
     'synapse_msgs': [
-        Mapping('PolynomialTrajectory', 'PolynomialTrajectory'),
+        Mapping('BezierTrajectory', 'BezierTrajectory'),
     ],
     'tf2_msgs': [
         Mapping('TFMessage', 'Pose_V'),

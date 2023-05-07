@@ -20,8 +20,8 @@ namespace ros_gz_bridge
 template<>
 void
 convert_ros_to_gz(
-  const synapse_msgs::msg::PolynomialTrajectory & ros_msg,
-  gz::msgs::PolynomialTrajectory & gz_msg)
+  const synapse_msgs::msg::BezierTrajectory & ros_msg,
+  gz::msgs::BezierTrajectory & gz_msg)
 {
   convert_ros_to_gz(ros_msg.header, (*gz_msg.mutable_header()));
 
@@ -29,9 +29,7 @@ convert_ros_to_gz(
 
   gz_msg.set_time_start(ros_msg.time_start);
 
-  gz_msg.set_time_end(ros_msg.time_end);
-
-  gz_msg.set_poly_order(ros_msg.poly_order);
+  gz_msg.set_time_stop(ros_msg.time_stop);
 
   for (auto i = 0u; i < ros_msg.x.size(); ++i) {
     gz_msg.add_x(ros_msg.x[i]);
@@ -53,8 +51,8 @@ convert_ros_to_gz(
 template<>
 void
 convert_gz_to_ros(
-  const gz::msgs::PolynomialTrajectory & gz_msg,
-  synapse_msgs::msg::PolynomialTrajectory & ros_msg)
+  const gz::msgs::BezierTrajectory & gz_msg,
+  synapse_msgs::msg::BezierTrajectory & ros_msg)
 {
   convert_gz_to_ros(gz_msg.header(), ros_msg.header);
 
@@ -62,9 +60,7 @@ convert_gz_to_ros(
 
   ros_msg.time_start = gz_msg.time_start();
 
-  ros_msg.time_end = gz_msg.time_end();
-
-  ros_msg.poly_order = gz_msg.poly_order();
+  ros_msg.time_stop = gz_msg.time_stop();
 
   for (auto i = 0; i < gz_msg.x_size(); ++i) {
     ros_msg.x.push_back(gz_msg.x(i));

@@ -16,10 +16,10 @@
 #define ROS_GZ_BRIDGE__CONVERT__SYNAPSE_MSGS_HPP_
 
 // Gazebo Msgs
-#include <gz/msgs/polynomial_trajectory.pb.h>
+#include <gz/msgs/bezier_trajectory.pb.h>
 
 // ROS 2 messages
-#include <synapse_msgs/msg/polynomial_trajectory.hpp>
+#include <synapse_msgs/msg/bezier_trajectory.hpp>
 
 #include <ros_gz_bridge/convert_decl.hpp>
 
@@ -29,14 +29,14 @@ namespace ros_gz_bridge
 template<>
 void
 convert_ros_to_gz(
-  const synapse_msgs::msg::PolynomialTrajectory & ros_msg,
-  gz::msgs::PolynomialTrajectory & gz_msg);
+  const synapse_msgs::msg::BezierTrajectory & ros_msg,
+  gz::msgs::BezierTrajectory & gz_msg);
 
 template<>
 void
 convert_gz_to_ros(
-  const gz::msgs::PolynomialTrajectory & gz_msg,
-  synapse_msgs::msg::PolynomialTrajectory & ros_msg);
+  const gz::msgs::BezierTrajectory & gz_msg,
+  synapse_msgs::msg::BezierTrajectory & ros_msg);
 
 }  // namespace ros_gz_bridge
 
