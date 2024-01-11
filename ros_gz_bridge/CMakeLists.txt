@@ -70,6 +70,7 @@ set(GZ_MSGS_VERSION_FULL ${GZ_MSGS_VERSION_MAJOR}.${GZ_MSGS_VERSION_MINOR}.${GZ_
 set(BRIDGE_MESSAGE_TYPES
   builtin_interfaces
   actuator_msgs
+  camera_track_msgs
   geometry_msgs
   nav_msgs
   rcl_interfaces

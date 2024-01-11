@@ -16,6 +16,7 @@
 #define ROS_GZ_BRIDGE__CONVERT_HPP_
 
 #include <ros_gz_bridge/convert/actuator_msgs.hpp>
+#include <ros_gz_bridge/convert/camera_track_msgs.hpp>
 #include <ros_gz_bridge/convert/geometry_msgs.hpp>
 #include <ros_gz_bridge/convert/nav_msgs.hpp>
 #include <ros_gz_bridge/convert/ros_gz_interfaces.hpp>

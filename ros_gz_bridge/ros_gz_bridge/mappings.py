@@ -30,6 +30,9 @@ MAPPINGS = {
     'actuator_msgs': [
         Mapping('Actuators', 'Actuators'),
     ],
+    'camera_track_msgs': [
+        Mapping('CameraTrack', 'CameraTrack'),
+    ],
     'geometry_msgs': [
         Mapping('Point', 'Vector3d'),
         Mapping('Pose', 'Pose'),
