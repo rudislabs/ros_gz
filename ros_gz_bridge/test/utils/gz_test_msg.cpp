@@ -18,6 +18,11 @@
 
 #include <memory>
 #include <string>
+#include <cstddef>
+
+#if GZ_MSGS_MAJOR_VERSION >= 10
+#define GZ_MSGS_IMU_HAS_COVARIANCE
+#endif
 
 namespace ros_gz_bridge
 {
@@ -371,6 +376,7 @@ void createTestMsg(gz::msgs::PoseWithCovariance & _msg)
 {
   createTestMsg(*_msg.mutable_pose()->mutable_position());
   createTestMsg(*_msg.mutable_pose()->mutable_orientation());
+  createTestMsg(*_msg.mutable_pose()->mutable_header());
   for (int i = 0; i < 36; i++) {
     _msg.mutable_covariance()->add_data(i);
   }
@@ -428,12 +434,15 @@ void createTestMsg(gz::msgs::TwistWithCovariance & _msg)
 {
   gz::msgs::Vector3d linear_msg;
   gz::msgs::Vector3d angular_msg;
+  gz::msgs::Header header_msg;
 
   createTestMsg(linear_msg);
   createTestMsg(angular_msg);
+  createTestMsg(header_msg);
 
   _msg.mutable_twist()->mutable_linear()->CopyFrom(linear_msg);
   _msg.mutable_twist()->mutable_angular()->CopyFrom(angular_msg);
+  _msg.mutable_twist()->mutable_header()->CopyFrom(header_msg);
   for (int i = 0; i < 36; i++) {
     _msg.mutable_covariance()->add_data(i);
   }
@@ -515,6 +524,30 @@ void compareTestMsg(const std::shared_ptr<gz::msgs::Entity> & _msg)
   EXPECT_EQ(expected_msg.id(), _msg->id());
   EXPECT_EQ(expected_msg.name(), _msg->name());
   EXPECT_EQ(expected_msg.type(), _msg->type());
+}
+
+void createTestMsg(gz::msgs::EntityWrench & _msg)
+{
+  gz::msgs::Header header_msg;
+  gz::msgs::Entity entity_msg;
+  gz::msgs::Wrench wrench_msg;
+
+  createTestMsg(header_msg);
+  createTestMsg(entity_msg);
+  createTestMsg(wrench_msg);
+
+  _msg.mutable_header()->CopyFrom(header_msg);
+  _msg.mutable_entity()->CopyFrom(entity_msg);
+  _msg.mutable_wrench()->CopyFrom(wrench_msg);
+}
+
+void compareTestMsg(const std::shared_ptr<gz::msgs::EntityWrench> & _msg)
+{
+  gz::msgs::EntityWrench expected_msg;
+  createTestMsg(expected_msg);
+  compareTestMsg(std::make_shared<gz::msgs::Header>(_msg->header()));
+  compareTestMsg(std::make_shared<gz::msgs::Entity>(_msg->entity()));
+  compareTestMsg(std::make_shared<gz::msgs::Wrench>(_msg->wrench()));
 }
 
 void createTestMsg(gz::msgs::Contact & _msg)
@@ -608,7 +641,6 @@ void compareTestMsg(const std::shared_ptr<gz::msgs::Contacts> & _msg)
   }
 }
 
-#if HAVE_DATAFRAME
 void createTestMsg(gz::msgs::Dataframe & _msg)
 {
   gz::msgs::Header header_msg;
@@ -646,7 +678,6 @@ void compareTestMsg(const std::shared_ptr<gz::msgs::Dataframe> & _msg)
   EXPECT_EQ(expected_msg.dst_address(), _msg->dst_address());
   EXPECT_EQ(expected_msg.data(), _msg->data());
 }
-#endif  // HAVE_DATAFRAME
 
 void createTestMsg(gz::msgs::Image & _msg)
 {
@@ -810,6 +841,13 @@ void createTestMsg(gz::msgs::IMU & _msg)
   _msg.mutable_orientation()->CopyFrom(quaternion_msg);
   _msg.mutable_angular_velocity()->CopyFrom(vector3_msg);
   _msg.mutable_linear_acceleration()->CopyFrom(vector3_msg);
+#ifdef GZ_MSGS_IMU_HAS_COVARIANCE
+  for (int i = 0; i < 9; i++) {
+    _msg.mutable_orientation_covariance()->add_data(i + 1);
+    _msg.mutable_angular_velocity_covariance()->add_data(i + 1);
+    _msg.mutable_linear_acceleration_covariance()->add_data(i + 1);
+  }
+#endif
 }
 
 void compareTestMsg(const std::shared_ptr<gz::msgs::IMU> & _msg)
@@ -818,6 +856,13 @@ void compareTestMsg(const std::shared_ptr<gz::msgs::IMU> & _msg)
   compareTestMsg(std::make_shared<gz::msgs::Quaternion>(_msg->orientation()));
   compareTestMsg(std::make_shared<gz::msgs::Vector3d>(_msg->angular_velocity()));
   compareTestMsg(std::make_shared<gz::msgs::Vector3d>(_msg->linear_acceleration()));
+#ifdef GZ_MSGS_IMU_HAS_COVARIANCE
+  for (int i = 0; i < 9; i++) {
+    EXPECT_EQ(_msg->orientation_covariance().data(i), i + 1);
+    EXPECT_EQ(_msg->angular_velocity_covariance().data(i), i + 1);
+    EXPECT_EQ(_msg->linear_acceleration_covariance().data(i), i + 1);
+  }
+#endif
 }
 
 void createTestMsg(gz::msgs::Axis & _msg)
@@ -1325,6 +1370,35 @@ void compareTestMsg(const std::shared_ptr<gz::msgs::Light> & _msg)
   EXPECT_FLOAT_EQ(expected_msg.intensity(), _msg->intensity());
 }
 
+void createTestMsg(gz::msgs::MaterialColor & _msg)
+{
+  createTestMsg(*_msg.mutable_header());
+  createTestMsg(*_msg.mutable_entity());
+  createTestMsg(*_msg.mutable_ambient());
+  createTestMsg(*_msg.mutable_diffuse());
+  createTestMsg(*_msg.mutable_specular());
+  createTestMsg(*_msg.mutable_emissive());
+
+  _msg.set_shininess(1.0);
+  _msg.set_entity_match(gz::msgs::MaterialColor::EntityMatch::MaterialColor_EntityMatch_ALL);
+}
+
+void compareTestMsg(const std::shared_ptr<gz::msgs::MaterialColor> & _msg)
+{
+  gz::msgs::MaterialColor expected_msg;
+  createTestMsg(expected_msg);
+
+  compareTestMsg(std::make_shared<gz::msgs::Header>(_msg->header()));
+  compareTestMsg(std::make_shared<gz::msgs::Entity>(_msg->entity()));
+  compareTestMsg(std::make_shared<gz::msgs::Color>(_msg->ambient()));
+  compareTestMsg(std::make_shared<gz::msgs::Color>(_msg->diffuse()));
+  compareTestMsg(std::make_shared<gz::msgs::Color>(_msg->specular()));
+  compareTestMsg(std::make_shared<gz::msgs::Color>(_msg->emissive()));
+
+  EXPECT_EQ(expected_msg.shininess(), _msg->shininess());
+  EXPECT_EQ(expected_msg.entity_match(), _msg->entity_match());
+}
+
 void createTestMsg(gz::msgs::GUICamera & _msg)
 {
   gz::msgs::Header header_msg;
@@ -1534,6 +1608,93 @@ void compareTestMsg(const std::shared_ptr<gz::msgs::AnnotatedAxisAligned2DBox_V>
   for (size_t i = 0; i < 4; i++) {
     compareTestMsg(
       std::make_shared<gz::msgs::AnnotatedAxisAligned2DBox>(
+        _msg->annotated_box(
+          i)));
+  }
+}
+
+void createTestMsg(gz::msgs::AnnotatedOriented3DBox & _msg)
+{
+  gz::msgs::Header header_msg;
+
+  createTestMsg(header_msg);
+
+  _msg.mutable_header()->CopyFrom(header_msg);
+
+  _msg.set_label(1);
+
+  gz::msgs::Oriented3DBox * box = new gz::msgs::Oriented3DBox();
+  gz::msgs::Vector3d * center = new gz::msgs::Vector3d();
+  gz::msgs::Vector3d * size = new gz::msgs::Vector3d();
+  gz::msgs::Quaternion * orientation = new gz::msgs::Quaternion();
+
+  center->set_x(2.0);
+  center->set_y(4.0);
+  center->set_z(6.0);
+  size->set_x(3.0);
+  size->set_y(5.0);
+  size->set_z(7.0);
+  orientation->set_x(0.733);
+  orientation->set_y(0.462);
+  orientation->set_z(0.191);
+  orientation->set_w(0.462);
+
+  box->set_allocated_center(center);
+  box->set_allocated_boxsize(size);
+  box->set_allocated_orientation(orientation);
+  _msg.set_allocated_box(box);
+}
+
+void compareTestMsg(const std::shared_ptr<gz::msgs::AnnotatedOriented3DBox> & _msg)
+{
+  gz::msgs::AnnotatedOriented3DBox expected_msg;
+  createTestMsg(expected_msg);
+
+  compareTestMsg(std::make_shared<gz::msgs::Header>(_msg->header()));
+
+  EXPECT_EQ(expected_msg.label(), _msg->label());
+
+  gz::msgs::Oriented3DBox box = _msg->box();
+  gz::msgs::Vector3d center = box.center();
+  gz::msgs::Vector3d size = box.boxsize();
+  gz::msgs::Quaternion orientation = box.orientation();
+
+  EXPECT_EQ(expected_msg.box().center().x(), center.x());
+  EXPECT_EQ(expected_msg.box().center().y(), center.y());
+  EXPECT_EQ(expected_msg.box().center().z(), center.z());
+  EXPECT_EQ(expected_msg.box().boxsize().x(), size.x());
+  EXPECT_EQ(expected_msg.box().boxsize().y(), size.y());
+  EXPECT_EQ(expected_msg.box().boxsize().z(), size.z());
+  EXPECT_EQ(expected_msg.box().orientation().w(), orientation.w());
+  EXPECT_EQ(expected_msg.box().orientation().x(), orientation.x());
+  EXPECT_EQ(expected_msg.box().orientation().y(), orientation.y());
+  EXPECT_EQ(expected_msg.box().orientation().z(), orientation.z());
+}
+
+void createTestMsg(gz::msgs::AnnotatedOriented3DBox_V & _msg)
+{
+  gz::msgs::Header header_msg;
+
+  createTestMsg(header_msg);
+
+  _msg.mutable_header()->CopyFrom(header_msg);
+
+  for (size_t i = 0; i < 4; i++) {
+    gz::msgs::AnnotatedOriented3DBox * box = _msg.add_annotated_box();
+    createTestMsg(*box);
+  }
+}
+
+void compareTestMsg(const std::shared_ptr<gz::msgs::AnnotatedOriented3DBox_V> & _msg)
+{
+  gz::msgs::AnnotatedOriented3DBox_V expected_msg;
+  createTestMsg(expected_msg);
+
+  compareTestMsg(std::make_shared<gz::msgs::Header>(_msg->header()));
+
+  for (size_t i = 0; i < 4; i++) {
+    compareTestMsg(
+      std::make_shared<gz::msgs::AnnotatedOriented3DBox>(
         _msg->annotated_box(
           i)));
   }

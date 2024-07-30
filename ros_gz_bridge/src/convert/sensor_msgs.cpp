@@ -17,6 +17,12 @@
 #include "convert/utils.hpp"
 #include "ros_gz_bridge/convert/sensor_msgs.hpp"
 
+#include "gz/msgs/config.hh"
+
+#if GZ_MSGS_MAJOR_VERSION >= 10
+#define GZ_MSGS_IMU_HAS_COVARIANCE
+#endif
+
 namespace ros_gz_bridge
 {
 
@@ -160,13 +166,11 @@ convert_gz_to_ros(
 
   ros_msg.is_bigendian = false;
   ros_msg.step = ros_msg.width * num_channels * octets_per_channel;
-
-  auto count = ros_msg.step * ros_msg.height;
   ros_msg.data.resize(ros_msg.step * ros_msg.height);
-  std::copy(
-    gz_msg.data().begin(),
-    gz_msg.data().begin() + count,
-    ros_msg.data.begin());
+
+  // Prefer memcpy over std::copy for performance reasons,
+  // see https://github.com/gazebosim/ros_gz/pull/565
+  memcpy(ros_msg.data.data(), gz_msg.data().c_str(), gz_msg.data().size());
 }
 
 template<>
@@ -274,6 +278,18 @@ convert_ros_to_gz(
   convert_ros_to_gz(ros_msg.orientation, (*gz_msg.mutable_orientation()));
   convert_ros_to_gz(ros_msg.angular_velocity, (*gz_msg.mutable_angular_velocity()));
   convert_ros_to_gz(ros_msg.linear_acceleration, (*gz_msg.mutable_linear_acceleration()));
+
+#ifdef GZ_MSGS_IMU_HAS_COVARIANCE
+  for (const auto & elem : ros_msg.linear_acceleration_covariance) {
+    gz_msg.mutable_linear_acceleration_covariance()->add_data(elem);
+  }
+  for (const auto & elem : ros_msg.orientation_covariance) {
+    gz_msg.mutable_orientation_covariance()->add_data(elem);
+  }
+  for (const auto & elem : ros_msg.angular_velocity_covariance) {
+    gz_msg.mutable_angular_velocity_covariance()->add_data(elem);
+  }
+#endif
 }
 
 template<>
@@ -287,7 +303,29 @@ convert_gz_to_ros(
   convert_gz_to_ros(gz_msg.angular_velocity(), ros_msg.angular_velocity);
   convert_gz_to_ros(gz_msg.linear_acceleration(), ros_msg.linear_acceleration);
 
-  // Covariances not supported in gz::msgs::IMU
+#ifdef GZ_MSGS_IMU_HAS_COVARIANCE
+  int data_size = gz_msg.linear_acceleration_covariance().data_size();
+  if (data_size == 9) {
+    for (int i = 0; i < data_size; ++i) {
+      auto data = gz_msg.linear_acceleration_covariance().data()[i];
+      ros_msg.linear_acceleration_covariance[i] = data;
+    }
+  }
+  data_size = gz_msg.angular_velocity_covariance().data_size();
+  if (data_size == 9) {
+    for (int i = 0; i < data_size; ++i) {
+      auto data = gz_msg.angular_velocity_covariance().data()[i];
+      ros_msg.angular_velocity_covariance[i] = data;
+    }
+  }
+  data_size = gz_msg.orientation_covariance().data_size();
+  if (data_size == 9) {
+    for (int i = 0; i < data_size; ++i) {
+      auto data = gz_msg.orientation_covariance().data()[i];
+      ros_msg.orientation_covariance[i] = data;
+    }
+  }
+#endif
 }
 
 template<>
@@ -480,7 +518,7 @@ convert_gz_to_ros(
   ros_msg.longitude = gz_msg.longitude_deg();
   ros_msg.altitude = gz_msg.altitude();
 
-  // position_covariance is not supported in Ignition::Msgs::NavSat.
+  // position_covariance is not supported in gz::msgs::NavSat.
   ros_msg.position_covariance_type = sensor_msgs::msg::NavSatFix::COVARIANCE_TYPE_UNKNOWN;
   ros_msg.status.status = sensor_msgs::msg::NavSatStatus::STATUS_FIX;
 }

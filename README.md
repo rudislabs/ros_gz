@@ -8,15 +8,21 @@ Galactic | Edifice | [galactic](https://github.com/gazebosim/ros_gz/tree/galacti
 Galactic | Fortress | [galactic](https://github.com/gazebosim/ros_gz/tree/galactic) | only from source
 Humble | Fortress | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | https://packages.ros.org
 Humble | Garden | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | [gazebo packages](https://gazebosim.org/docs/latest/ros_installation#gazebo-garden-with-ros-2-humble-iron-or-rolling-use-with-caution-)[^1]
-Humble | Harmonic | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | only from source
-Rolling | Edifice | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | only from source
-Rolling | Fortress | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | https://packages.ros.org
+Humble | Harmonic | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | [gazebo packages](https://gazebosim.org/docs/harmonic/ros_installation#-gazebo-harmonic-with-ros-2-humble-iron-or-rolling-use-with-caution-)[^1]
+Iron | Fortress | [humble](https://github.com/gazebosim/ros_gz/tree/iron) | https://packages.ros.org
+Iron | Garden | [humble](https://github.com/gazebosim/ros_gz/tree/iron) | only from source
+Iron | Harmonic | [humble](https://github.com/gazebosim/ros_gz/tree/iron) | only from source
+Jazzy* | Garden | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | only from source
+Jazzy* | Harmonic | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | https://packages.ros.org
+Rolling | Fortress | [humble](https://github.com/gazebosim/ros_gz/tree/humble) | https://packages.ros.org
 Rolling | Garden | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | only from source
 Rolling | Harmonic | [ros2](https://github.com/gazebosim/ros_gz/tree/ros2) | only from source
 
 [^1]: Binaries for these pairings are provided from a the packages.osrfoundation.org repository. Refer to https://gazebosim.org/docs/latest/ros_installation for installation instructions.
 
-For information on ROS 2 and Gazebo compatibility, refer to the [melodic branch README](https://github.com/gazebosim/ros_gz/tree/melodic)
+* ROS 2 Jazzy Jalisco is slated for release on May 23rd, 2024. [Full ROS 2 release information is available in REP-2000.]
+
+For information on ROS(1) and Gazebo compatibility, refer to the [noetic branch README](https://github.com/gazebosim/ros_gz/tree/noetic)
 
 > Please [ticket an issue](https://github.com/gazebosim/ros_gz/issues/) if you'd like support to be added for some combination.
 
@@ -55,11 +61,11 @@ This repository holds packages that provide integration between
 
 ## Install
 
-This branch supports ROS Humble. See above for other ROS versions.
+This branch supports ROS Rolling. See above for other ROS versions.
 
 ### Binaries
 
-Humble binaries are available for Fortress.
+Rolling binaries are available for Fortress.
 They are hosted at https://packages.ros.org.
 
 1. Add https://packages.ros.org
@@ -70,14 +76,14 @@ They are hosted at https://packages.ros.org.
 
 1. Install `ros_gz`
 
-        sudo apt install ros-humble-ros-gz
+        sudo apt install ros-rolling-ros-gz
 
 ### From source
 
 #### ROS
 
 Be sure you've installed
-[ROS Humble](https://docs.ros.org/en/humble/Installation.html)
+[ROS Rolling](https://index.ros.org/doc/ros2/Installation/)
 (at least ROS-Base). More ROS dependencies will be installed below.
 
 #### Gazebo
@@ -103,7 +109,7 @@ The following steps are for Linux and OSX.
     cd ~/ws/src
 
     # Download needed software
-    git clone https://github.com/gazebosim/ros_gz.git -b humble
+    git clone https://github.com/gazebosim/ros_gz.git -b ros2
     ```
 
 1. Install dependencies (this may also install Gazebo):
@@ -129,22 +135,6 @@ The following steps are for Linux and OSX.
   > The `ros_gz` library makes heavy use of templates which causes compilers to consume a lot of memory. If your build fails with `c++: fatal error: Killed signal terminated program cc1plus`
   > try building with `colcon build --parallel-workers=1 --executor sequential`. You might also have to set `export MAKEFLAGS="-j 1"` before running `colcon build` to limit
   > the number of processors used to build a single package.
-
-    If `colcon build` fails with [this issue](https://github.com/gazebosim/ros_gz/issues/401)
-
-    ```
-    CMake Error at CMakeLists.txt:81 (find_package):
-      By not providing "Findactuator_msgs.cmake" in CMAKE_MODULE_PATH this
-      project has asked CMake to find a package configuration file provided by
-      "actuator_msgs", but CMake did not find one.
-    ```
-
-    ```bash
-    cd src
-    git clone git@github.com:rudislabs/actuator_msgs.git
-    cd ../
-    colcon build
-    ```
 
 ## ROSCon 2022
 

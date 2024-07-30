@@ -168,6 +168,27 @@ convert_gz_to_ros(
 template<>
 void
 convert_ros_to_gz(
+  const geometry_msgs::msg::PoseWithCovarianceStamped & ros_msg,
+  gz::msgs::PoseWithCovariance & gz_msg)
+{
+  convert_ros_to_gz(ros_msg.header, (*gz_msg.mutable_pose()->mutable_header()));
+  convert_ros_to_gz(ros_msg.pose, gz_msg);
+}
+
+template<>
+void
+convert_gz_to_ros(
+  const gz::msgs::PoseWithCovariance & gz_msg,
+  geometry_msgs::msg::PoseWithCovarianceStamped & ros_msg)
+{
+  convert_gz_to_ros(gz_msg.pose().header(), ros_msg.header);
+  convert_gz_to_ros(gz_msg, ros_msg.pose);
+}
+
+
+template<>
+void
+convert_ros_to_gz(
   const geometry_msgs::msg::PoseStamped & ros_msg,
   gz::msgs::Pose & gz_msg)
 {
@@ -304,6 +325,26 @@ convert_gz_to_ros(
       ros_msg.covariance[i] = data;
     }
   }
+}
+
+template<>
+void
+convert_ros_to_gz(
+  const geometry_msgs::msg::TwistWithCovarianceStamped & ros_msg,
+  gz::msgs::TwistWithCovariance & gz_msg)
+{
+  convert_ros_to_gz(ros_msg.header, (*gz_msg.mutable_twist()->mutable_header()));
+  convert_ros_to_gz(ros_msg.twist, gz_msg);
+}
+
+template<>
+void
+convert_gz_to_ros(
+  const gz::msgs::TwistWithCovariance & gz_msg,
+  geometry_msgs::msg::TwistWithCovarianceStamped & ros_msg)
+{
+  convert_gz_to_ros(gz_msg.twist().header(), ros_msg.header);
+  convert_gz_to_ros(gz_msg, ros_msg.twist);
 }
 
 template<>
